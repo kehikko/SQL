@@ -1,2 +1,2 @@
 # SQL
-Simplistic SQL interfaces (for Kehikko framework).
+Simplistic SQL interfaces (for kehikko framework).
