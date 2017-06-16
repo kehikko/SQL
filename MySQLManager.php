@@ -236,24 +236,26 @@ class MySQLManager extends \Core\Module
 
 	public function query($query, $return_data = false)
 	{
-		$result = $this->connection->query($query);
-		if (!$result)
+		if (!$this->connection->multi_query($query))
 		{
 			kernel::log(LOG_ERR, 'Query failed, database: ' . $this->database . ', query: "' . $query . '", error: ' . $this->connection->error);
 			return false;
 		}
 
-		if ($return_data)
+		$data = $return_data ? array() : true;
+		do
 		{
-			$data = array();
-			while (($row = $result->fetch_assoc()))
+			$result = $this->connection->store_result();
+			if ($result)
 			{
-				$data[] = $row;
+				while (is_array($data) && ($row = $result->fetch_assoc()))
+				{
+					$data[] = $row;
+				}
+				$result->close();
 			}
-			$result->free();
-			return $data;
-		}
+		} while ($this->connection->next_result());
 
-		return true;
+		return $data;
 	}
 }
